@@ -1,10 +1,10 @@
 import React from "react";
 import {useState} from "react"
 
-function Home({handleSubmit}) {
+function Home({data,handleSubmit}) {
 const [email,setEmail]=useState("");
 const [password,setPassword]=useState("");
-console.log(handleSubmit)
+console.log(data)
 function submit(e){
 e.preventDefault();
 handleSubmit(email,password);
