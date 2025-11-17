@@ -1,1 +1,6 @@
 @import "tailwindcss";
+/* index.css */
+.bs * {
+  all: revert; /* Reverts Tailwind reset so Bootstrap behaves normally */
+}
+

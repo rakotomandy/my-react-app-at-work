@@ -1,12 +1,12 @@
 import { Routes, Route, useNavigate } from "react-router-dom";
 import Home from "./Home";
 import Users from "./Users";
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 
 function App() {
   const [data, setData] = useState([]);
-  const navigate=useNavigate();
+  const navigate = useNavigate();
 
   async function handleSubmit(email, password) {
     const send = await axios.post("http://localhost/mvc/form/insert", {
@@ -14,45 +14,74 @@ function App() {
       password: password,
     });
 
-    if (send.status == "200") {
+    if (send.status == 200) {
       alert("data sent successfully");
       getData();
-      navigate("/Users")
+      navigate("/Users");
     }
   }
 
-  useEffect(()=>{
-    getData()
-  },[])
+  useEffect(() => {
+    getData();
+  }, []);
 
   async function getData() {
     await axios
       .get("http://localhost/mvc/form/data")
       .then((response) => setData(response.data))
       .catch((error) => {
-        // If request fails, this block runs
         if (error.response) {
-          // Server responded with status code outside 2xx
-          console.error(
-            "GET /posts failed with status:",
-            error.response.status
-          );
-          console.error("Response data:", error.response.data);
+          console.error("GET failed:", error.response.status);
+          console.error("Response:", error.response.data);
         } else if (error.request) {
-          // Request was made but no response received
-          console.error("GET /posts no response received:", error.request);
+          console.error("GET no response:", error.request);
         } else {
-          // Something else triggered the error
-          console.error("GET /posts error message:", error.message);
+          console.error("Error:", error.message);
         }
       });
   }
 
+  async function deleteUser(id) {
+    const del = await axios.post("http://localhost/mvc/form/delete", {
+      id: id,
+    });
+
+    if (del.status == 200) {
+      getData();
+      // setData(prev=>prev.filter((user)=>user.id!==id))
+    }
+  }
+
+  // ✅ ADD UPDATE FUNCTION
+  async function updateUser(id, email, password) {
+    const upd = await axios.post("http://localhost/mvc/form/update", {
+      id: id,
+      email: email,
+      password: password,
+    });
+
+    if (upd.status == 200) {
+      alert("user updated");
+      getData();
+      // optional frontend update:
+      // setData(prev => prev.map(user => user.id === id ? { ...user, email, password } : user));
+    }
+  }
+
   return (
-      <Routes>
-        <Route path="/" element={<Home handleSubmit={handleSubmit} />} />
-        <Route path="/Users" element={<Users data={data} />} />
-      </Routes>
+    <Routes>
+      <Route path="/" element={<Home handleSubmit={handleSubmit} />} />
+      <Route
+        path="/Users"
+        element={
+          <Users
+            deleteUser={deleteUser}
+            updateUser={updateUser}   // ← send update function
+            data={data}
+          />
+        }
+      />
+    </Routes>
   );
 }
 
